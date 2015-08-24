@@ -21,10 +21,13 @@ echo "$(date) dhcp -------------------------------"
 mkdir -p /var/lib/boot2docker/log
 
 # Add any custom certificate chains for secure private registries
-/etc/rc.d/install-ca-certs
+# /etc/rc.d/install-ca-certs
 
 # import settings from profile (or unset them)
 test -f "/var/lib/boot2docker/profile" && . "/var/lib/boot2docker/profile"
+
+# Disable TLS which is safe since our VM never gets attached to the outside world
+export DOCKER_TLS="no"
 
 # set the hostname
 /etc/rc.d/hostname
@@ -53,8 +56,8 @@ fi
 # Automount Shared Folders (VirtualBox, etc.)
 /etc/rc.d/automount-shares
 
-# Configure SSHD
-/etc/rc.d/sshd
+# We won't need to SSH into this machine ever
+# /etc/rc.d/SSHD
 
 # Launch ACPId
 /etc/rc.d/acpid
@@ -73,8 +76,18 @@ if [ -e /var/lib/boot2docker/bootsync.sh ]; then
     echo "------------------- ran /var/lib/boot2docker/bootsync.sh"
 fi
 
+# Untar persistence /var/lib/docker and /var/lib/bootdocker
+mount -t vboxsf scratch /root/scratch/
+if [ -e /root/scratch/boinc2docker_persistence.tar ]; then
+    echo "Loading persistence directories..."
+    tar xf /root/scratch/boinc2docker_persistence.tar -C /
+else
+    echo "No persistence directory found."
+fi
+
 # Launch Docker
 /etc/rc.d/docker
+
 
 # Allow local HD customisation
 if [ -e /var/lib/boot2docker/bootlocal.sh ]; then
@@ -86,16 +99,47 @@ fi
 # disabled - this script was written assuming bash, which we no longer have.
 #/etc/rc.d/automated_script.sh
 
+# Only running this in VBox so don't need these:
 # Run Hyper-V KVP Daemon
-if modprobe hv_utils &> /dev/null; then
-    /usr/sbin/hv_kvp_daemon
-fi
+# if modprobe hv_utils &> /dev/null; then
+#     /usr/sbin/hv_kvp_daemon
+# fi
 
 # Launch vmware-tools
-/etc/rc.d/vmtoolsd
+# /etc/rc.d/vmtoolsd
 
 # Launch xenserver-tools
-/etc/rc.d/xedaemon
+# /etc/rc.d/xedaemon
 
 # Load Parallels Tools daemon
-/etc/rc.d/prltoolsd
+# /etc/rc.d/prltoolsd
+
+# Log persisted images, also wait max 10 sec for the docker daemon to start properly
+echo "Images found in persistence directory:"
+echo "-------------------"
+for i in $(seq 10); do sleep 1 && docker images && break; done
+echo "-------------------"
+
+# If present run BOINC app, otherwise give user 10 sec to press key to drop to shell
+if [[ -f /root/shared/boinc_app ]]; then
+
+    # Run app
+    cd /root/shared
+    chmod +x boinc_app
+    ./boinc_app
+    boinc_app_exit_status=$?
+
+    # Save persistence
+    save_docker.sh --no-restart
+
+    # Tar up results and log files
+    echo "Saving results..."
+    (cd /root/shared/results && tar czvf /root/shared/results.tgz *)
+    
+    # Alert BOINC of the exit status
+    echo boinc_app_exit_status > /root/shared/completion_trigger_file
+
+fi
+
+echo "Shutting down in 5 seconds.  Hit any key to drop to shell."
+read -s -n 1 -t 5 key && (echo "Dropping to shell..."; exit) || shutdown -h now

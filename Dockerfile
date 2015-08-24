@@ -267,12 +267,8 @@ RUN curl -L -o $ROOTFS/usr/local/bin/docker https://get.docker.io/builds/Linux/x
     { $ROOTFS/usr/local/bin/docker version || true; }
 
 # Get the git versioning info
-COPY .git /git/.git
-RUN cd /git && \
-    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD) && \
-    GITSHA1=$(git rev-parse --short HEAD) && \
-    DATE=$(date) && \
-    echo "${GIT_BRANCH} : ${GITSHA1} - ${DATE}" > $ROOTFS/etc/boot2docker
+RUN DATE=$(date) && \
+    echo "boinc2docker : ${DATE}" > $ROOTFS/etc/boot2docker
 
 # Install Tiny Core Linux rootfs
 RUN cd $ROOTFS && zcat /tcl_rootfs.gz | cpio -f -i -H newc -d --no-absolute-filenames
@@ -315,6 +311,10 @@ RUN mv $ROOTFS/boot*.sh $ROOTFS/opt/ && \
 # Make sure we have the correct shutdown
 RUN mv $ROOTFS/shutdown.sh $ROOTFS/opt/shutdown.sh && \
 	chmod +x $ROOTFS/opt/shutdown.sh
+
+# Get the save docker script in place
+RUN mv $ROOTFS/save_docker.sh $ROOTFS/usr/local/sbin/save_docker.sh && \
+    chmod +x $ROOTFS/usr/local/sbin/save_docker.sh
 
 # Add serial console
 RUN echo "#!/bin/sh" > $ROOTFS/usr/local/bin/autologin && \
