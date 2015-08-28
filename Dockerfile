@@ -332,6 +332,14 @@ COPY rootfs/crontab $ROOTFS/var/spool/cron/crontabs/root
 # Copy boot params
 COPY rootfs/isolinux /tmp/iso/boot/isolinux
 
+# Get vboxmonitor
+RUN zip=vboxmonitor_26086_x86_64-pc-linux-gnu.zip && \
+    cd $ROOTFS/usr/local/bin && \
+    curl -O http://boinc.berkeley.edu/dl/$zip && \
+    file=$(unzip -j $zip | grep inflating | awk '{print $NF}') && \
+    rm $zip &&\
+    mv $file vboxmonitor
+
 COPY rootfs/make_iso.sh /
 
 RUN /make_iso.sh

@@ -56,6 +56,12 @@ fi
 # Automount Shared Folders (VirtualBox, etc.)
 /etc/rc.d/automount-shares
 
+# Mount BOINC shared folder 
+echo "Mounting BOINC shared/..."
+mkdir -p /root/shared /root/scratch
+mount -t vboxsf shared /root/shared/ 
+mkdir -p /root/shared/results
+
 # We won't need to SSH into this machine ever
 # /etc/rc.d/SSHD
 
