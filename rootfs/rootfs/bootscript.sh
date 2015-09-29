@@ -126,7 +126,7 @@ echo "-------------------"
 for i in $(seq 10); do sleep 1 && docker images && break; done
 echo "-------------------"
 
-# If present run BOINC app, otherwise give user 10 sec to press key to drop to shell
+# If present run BOINC app
 if [[ -f /root/shared/boinc_app ]]; then
 
     # Run app
