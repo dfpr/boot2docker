@@ -135,9 +135,6 @@ if [[ -f /root/shared/boinc_app ]]; then
     ./boinc_app
     boinc_app_exit_status=$?
 
-    # Save persistence
-    save_docker.sh --no-restart
-
     # Tar up results and log files
     echo "Saving results..."
     (cd /root/shared/results && tar czvf /root/shared/results.tgz *)

@@ -4,7 +4,7 @@
 # * save docker files to the persistence file in the scratch folder
 # * optionally start Docker back up
 #
-# Can be used from a boinc_app to do a save part way through, and is always run on shutdown. 
+# Should be used from a boinc_app to do save downloaded images immediately after a docker pull 
 
 /usr/local/etc/init.d/docker stop
 
