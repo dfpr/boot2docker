@@ -138,7 +138,7 @@ if [[ -f /root/shared/boinc_app ]]; then
     (cd /root/shared/results && tar czvf /root/shared/results.tgz *)
     
     # Alert BOINC of the exit status
-    echo boinc_app_exit_status > /root/shared/completion_trigger_file
+    echo $boinc_app_exit_status > /root/shared/completion_trigger_file
 
 fi
 
