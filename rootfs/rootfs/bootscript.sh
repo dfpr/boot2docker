@@ -141,6 +141,3 @@ if [[ -f /root/shared/boinc_app ]]; then
     echo $boinc_app_exit_status > /root/shared/completion_trigger_file
 
 fi
-
-echo "Shutting down in 5 seconds.  Hit any key to drop to shell."
-read -s -n 1 -t 5 key && (echo "Dropping to shell..."; exit) || shutdown -h now
