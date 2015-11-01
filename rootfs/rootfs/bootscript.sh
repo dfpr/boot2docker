@@ -130,9 +130,7 @@ echo "-------------------"
 if [[ -f /root/shared/boinc_app ]]; then
 
     # Run app
-    cd /root/shared
-    chmod +x boinc_app
-    ./boinc_app
+    cd /root/shared && sh boinc_app
     boinc_app_exit_status=$?
 
     # Tar up results and log files
