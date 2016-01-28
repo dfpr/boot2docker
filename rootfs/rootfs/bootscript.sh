@@ -133,6 +133,9 @@ if [[ -f /root/shared/boinc_app ]]; then
     cd /root/shared && sh boinc_app
     boinc_app_exit_status=$?
 
+    # dump Docker log on error
+    if [ $boinc_app_exit_status != 0 ]; then cat /var/log/docker.log; fi
+
     # Tar up results and log files
     echo "Saving results..."
     (cd /root/shared/results && tar czvf /root/shared/results.tgz *)
