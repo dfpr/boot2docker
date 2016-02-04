@@ -120,27 +120,36 @@ fi
 # Load Parallels Tools daemon
 # /etc/rc.d/prltoolsd
 
-# Log persisted images, also wait max 10 sec for the docker daemon to start properly
-echo "Images found in persistence directory:"
-echo "-------------------"
-for i in $(seq 10); do sleep 1 && docker images && break; done
-echo "-------------------"
 
 # If present run BOINC app
 if [[ -f /root/shared/boinc_app ]]; then
 
-    # Run app
-    cd /root/shared && sh boinc_app
-    boinc_app_exit_status=$?
+    echo "Prerun diagnostics..."
+    for i in $(seq 10); do sleep 1 && docker images && break; done
+    docker ps -a
+    du -sh /var/lib/docker
+    free -m
 
-    # dump Docker log on error
-    if [ $boinc_app_exit_status != 0 ]; then cat /var/log/docker.log; fi
+    # Run app
+    echo "Running boinc_app..."
+    (cd /root/shared && sh boinc_app)
+    exit_status=$?
+    echo "boinc_app exited (${exit_status})"
+
+    # dump some logs on failure
+    if [ $exit_status != 0 ]; then 
+        echo "-------------------docker.log-------------------"
+        tail -c 2k /var/log/docker.log
+        echo "-------------------dmesg-------------------"
+        dmesg | tail -c 2k
+        echo "-------------------"
+    fi
 
     # Tar up results and log files
     echo "Saving results..."
     (cd /root/shared/results && tar czvf /root/shared/results.tgz *)
     
     # Alert BOINC of the exit status
-    echo $boinc_app_exit_status > /root/shared/completion_trigger_file
+    echo $exit_status > /root/shared/completion_trigger_file
 
 fi
