@@ -9,6 +9,8 @@
 # Automount a hard drive
 /etc/rc.d/automount
 
+# set the hostname
+/etc/rc.d/hostname
 # Trigger the DHCP request sooner (the x64 bit userspace appears to be a second slower)
 echo "$(date) dhcp -------------------------------"
 /etc/rc.d/dhcp.sh
@@ -29,8 +31,6 @@ test -f "/var/lib/boot2docker/profile" && . "/var/lib/boot2docker/profile"
 # Disable TLS which is safe since our VM never gets attached to the outside world
 export DOCKER_TLS="no"
 
-# set the hostname
-/etc/rc.d/hostname
 
 # sync the clock
 /etc/rc.d/ntpd &
@@ -90,10 +90,8 @@ if [ -e /root/scratch/boinc2docker_persistence.tar ]; then
 else
     echo "No persistence directory found."
 fi
-
 # Launch Docker
 /etc/rc.d/docker
-
 
 # Allow local HD customisation
 if [ -e /var/lib/boot2docker/bootlocal.sh ]; then

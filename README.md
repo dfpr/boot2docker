@@ -6,11 +6,11 @@ small ~24MB download and boots in ~5s (YMMV).
 
 ## Features
 
-* Kernel 4.1.12 with AUFS, Docker v1.9.0 - using libcontainer
+* Kernel 4.1.19 with AUFS, Docker v1.10.3 - using libcontainer
 * Container persistence via disk automount on `/var/lib/docker`
 * SSH keys persistence via disk automount
 
-> **Note:** Boot2Docker uses port **2376**, the [registered IANA Docker SSL
+> **Note:** Boot2Docker uses port **2376**, the [registered IANA Docker TLS
 > port](http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=docker)
 
 ## Caveat Emptor
@@ -68,12 +68,12 @@ $ boot2docker download
 $ boot2docker up
 ```
 
-If your Boot2Docker virtual machine was created prior to 0.11.1-pre1, it's best
-to delete -  `boot2docker delete` and then `boot2docker init` to create a new
-VM.
+If your Boot2Docker virtual machine was created prior to 0.11.1-pre1, it's recommended that you
+delete -  `boot2docker delete` and then create a new
+VM - `boot2docker init`.
 
-The main changes are to add a `/var/lib/boot2docker/userdata.tar` file that is
-un-tarred into the `/home/docker` directory on boot. This file contains a
+The main change is the addition of a `/var/lib/boot2docker/userdata.tar` file that is
+un-tarred into the `/home/docker` directory on boot. This file contains
 `.ssh/authorized_keys` and `.ssh/authorized_keys2` files containing a public
 SSH key.
 
