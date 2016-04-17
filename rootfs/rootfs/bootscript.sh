@@ -58,7 +58,7 @@ fi
 
 # Mount BOINC shared folder 
 echo "Mounting BOINC shared/..."
-mkdir -p /root/shared /root/scratch
+mkdir -p /root/shared 
 mount -t vboxsf shared /root/shared/ 
 mkdir -p /root/shared/results
 
@@ -82,14 +82,6 @@ if [ -e /var/lib/boot2docker/bootsync.sh ]; then
     echo "------------------- ran /var/lib/boot2docker/bootsync.sh"
 fi
 
-# Untar persistence /var/lib/docker and /var/lib/bootdocker
-mount -t vboxsf scratch /root/scratch/
-if [ -e /root/scratch/boinc2docker_persistence.tar ]; then
-    echo "Loading persistence directories..."
-    tar xf /root/scratch/boinc2docker_persistence.tar -C /
-else
-    echo "No persistence directory found."
-fi
 # Launch Docker
 /etc/rc.d/docker
 
@@ -122,11 +114,8 @@ fi
 # If present run BOINC app
 if [[ -f /root/shared/boinc_app ]]; then
 
-    echo "Prerun diagnostics..."
+    echo "Waiting for Docker daemon to start..."
     for i in $(seq 10); do sleep 1 && docker images && break; done
-    docker ps -a
-    du -sh /var/lib/docker
-    free -m
 
     # Run app
     echo "Running boinc_app..."

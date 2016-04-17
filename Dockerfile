@@ -290,10 +290,6 @@ RUN mv $ROOTFS/boot*.sh $ROOTFS/opt/ && \
 RUN mv $ROOTFS/shutdown.sh $ROOTFS/opt/shutdown.sh && \
 	chmod +x $ROOTFS/opt/shutdown.sh
 
-# Get the save docker script in place
-RUN mv $ROOTFS/save_docker.sh $ROOTFS/usr/local/sbin/save_docker.sh && \
-    chmod +x $ROOTFS/usr/local/sbin/save_docker.sh
-
 # Add serial console
 RUN echo "#!/bin/sh" > $ROOTFS/usr/local/bin/autologin && \
 	echo "/bin/login -f docker" >> $ROOTFS/usr/local/bin/autologin && \
