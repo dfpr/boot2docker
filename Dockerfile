@@ -61,7 +61,7 @@ RUN jobs=$(nproc); \
 # The post kernel build process
 
 ENV ROOTFS          /rootfs
-ENV TCL_REPO_BASE   http://tinycorelinux.net/6.x/x86_64
+ENV TCL_REPO_BASE   http://tinycorelinux.net/7.x/x86_64
 # Note that the ncurses is here explicitly so that top continues to work
 ENV TCZ_DEPS        iptables \
                     iproute2 \
@@ -242,15 +242,11 @@ RUN depmod -a -b $ROOTFS $KERNEL_VERSION-boot2docker
 COPY VERSION $ROOTFS/etc/version
 RUN cp -v $ROOTFS/etc/version /tmp/iso/version
 
-# Get the Docker version that matches our boot2docker version
-# Note: `docker version` returns non-true when there is no server to ask
-RUN curl -fL -o $ROOTFS/usr/local/bin/docker https://get.docker.com/builds/Linux/x86_64/docker-$(cat $ROOTFS/etc/version) && \
-    chmod +x $ROOTFS/usr/local/bin/docker && \
-    $ROOTFS/usr/local/bin/docker -v
-
-# Get the git versioning info
-RUN DATE=$(date) && \
-    echo "boinc2docker : ${DATE}" > $ROOTFS/etc/boot2docker
+# Get the Docker binaries with version that matches our boot2docker version.
+RUN curl -fSL -o /tmp/dockerbin.tgz https://get.docker.com/builds/Linux/x86_64/docker-$(cat $ROOTFS/etc/version).tgz && \
+    tar -zxvf /tmp/dockerbin.tgz -C "$ROOTFS/usr/local/bin" --strip-components=1 && \
+    rm /tmp/dockerbin.tgz && \
+    chroot "$ROOTFS" docker -v
 
 # Install Tiny Core Linux rootfs
 RUN cd $ROOTFS && zcat /tcl_rootfs.gz | cpio -f -i -H newc -d --no-absolute-filenames
@@ -311,6 +307,10 @@ RUN echo root > $ROOTFS/etc/sysconfig/superuser
 # add some timezone files so we're explicit about being UTC
 RUN echo 'UTC' > $ROOTFS/etc/timezone \
 	&& cp -L /usr/share/zoneinfo/UTC $ROOTFS/etc/localtime
+
+# Get the git versioning info
+RUN DATE=$(date) && \
+    echo "boinc2docker : ${DATE}" > $ROOTFS/etc/boot2docker
 
 # Copy boot params
 COPY rootfs/isolinux /tmp/iso/boot/isolinux
